@@ -29,7 +29,7 @@ export const jobPostSchema = yup.object().shape({
       'Maximum experience must be greater than or equal to minimum',
       function (value) {
         const { experienceMin } = this.parent;
-        return value >= experienceMin;
+        return value === undefined || value === null || value >= experienceMin;
       }
     )
     .required('Maximum experience is required'),
@@ -45,7 +45,7 @@ export const jobPostSchema = yup.object().shape({
       'Maximum salary must be greater than or equal to minimum',
       function (value) {
         const { salaryMin } = this.parent;
-        return value >= salaryMin;
+        return value === undefined || value === null || value >= salaryMin;
       }
     )
     .required('Maximum salary is required'),
