@@ -1,0 +1,440 @@
+MOBILE APP API SPECIFICATION (DETAILED)
+=======================================
+
+BASE URL (Development): http://localhost:5001
+BASE URL (Production):  https://your-backend-domain.com
+
+--------------------------------------------------------------------------------
+1. AUTHENTICATION
+--------------------------------------------------------------------------------
+
+[POST] /api/auth/register
+Description: Create a new candidate account.
+Headers: Content-Type: application/json
+Body:
+{
+  "email": "candidate@example.com",        // Required, valid email
+  "password": "SecurePass123!",            // Required, min 8 chars, 1 upper, 1 lower, 1 number
+  "fullName": "John Doe"                   // Required, min 2 chars
+}
+Response (201 Created):
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": "65ae64b1f481234567890abc",
+      "email": "candidate@example.com",
+      "fullName": "John Doe",
+      "role": "CANDIDATE"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+
+[POST] /api/auth/login
+Description: Authenticate and receive tokens.
+Headers: Content-Type: application/json
+Body:
+{
+  "email": "candidate@example.com",
+  "password": "SecurePass123!"
+}
+Response (200 OK):
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": "65ae64b1f481234567890abc",
+      "email": "candidate@example.com",
+      "fullName": "John Doe",
+      "role": "CANDIDATE"
+    },
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+
+[POST] /api/auth/fcm-token
+Description: Register device for push notifications.
+Headers: Content-Type: application/json, Authorization: Bearer <access_token>
+Body:
+{
+  "fcmToken": "c4b2447b5626db082ef578..." // Required
+}
+Response (200 OK):
+{
+  "success": true,
+  "message": "FCM Token updated successfully"
+}
+
+--------------------------------------------------------------------------------
+2. USER PROFILE
+--------------------------------------------------------------------------------
+
+[GET] /api/auth/profile
+Description: Get current user profile details.
+Headers: Authorization: Bearer <access_token>
+Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "65ae64b1f481234567890abc",
+      "email": "candidate@example.com",
+      "fullName": "John Doe",
+      "role": "CANDIDATE",
+      "isActive": true,
+      "lastLogin": "2026-01-22T10:00:00.000Z",
+      "fcmToken": "c4b2447b5626db082ef578..." // Only if selected
+    },
+    "profile": {
+      "_id": "65ae64b1f481234567890abd",
+      "userId": "65ae64b1f481234567890abc",
+      "phoneNumber": "+1234567890",
+      "location": "San Francisco, CA",
+      "currentJobTitle": "Software Engineer",
+      "totalExperience": 5,
+      "expectedSalary": 150000,
+      "currency": "USD",
+      "noticePeriod": "30 days",
+      "preferredLocations": ["Remote", "San Francisco"],
+      "bio": "Experienced developer...",
+      "skills": ["React", "Node.js"],
+      "createdAt": "2026-01-22T10:00:00.000Z",
+      "updatedAt": "2026-01-22T10:00:00.000Z"
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+3. RESUME MANAGEMENT
+--------------------------------------------------------------------------------
+
+[POST] /api/candidate/resume/upload
+Description: Upload PDF resume for AI parsing.
+Headers: 
+  Authorization: Bearer <access_token>
+  Content-Type: multipart/form-data
+Body (FormData):
+  resume: <File> (Required, PDF only, max 5MB)
+Response (201 Created):
+{
+  "success": true,
+  "message": "Resume uploaded and analyzed successfully",
+  "data": {
+    "resume": {
+      "_id": "65ae64b1f481234567890abe",
+      "candidateId": "65ae64b1f481234567890abc",
+      "fileName": "resume.pdf",
+      "filePath": "uploads/resume-123.pdf",
+      "fileSize": 102400,
+      "uploadDate": "2026-01-22T10:05:00.000Z",
+      "isPrimary": true,
+      "createdAt": "2026-01-22T10:05:00.000Z",
+      "updatedAt": "2026-01-22T10:05:00.000Z"
+    },
+    "analysis": {
+      "_id": "65ae64b1f481234567890abf",
+      "resumeId": "65ae64b1f481234567890abe",
+      "candidateId": "65ae64b1f481234567890abc",
+      "extractedSkills": ["javascript", "typescript", "react"],
+      "extractedTechStack": ["node.js", "mongodb"],
+      "totalExperience": 5.5,
+      "educationSummary": "B.S. Computer Science",
+      "workExperience": [
+        {
+          "company": "Tech Corp",
+          "position": "Senior Dev",
+          "duration": "2 years",
+          "description": "Led team..."
+        }
+      ],
+      "certifications": ["AWS Certified"],
+      "keywords": ["full stack", "mobile"],
+      "candidateSummary": "Strong background in mobile dev...",
+      "parsedAt": "2026-01-22T10:05:05.000Z",
+      "createdAt": "2026-01-22T10:05:05.000Z",
+      "updatedAt": "2026-01-22T10:05:05.000Z"
+    }
+  }
+}
+
+[GET] /api/candidate/resumes
+Description: Get list of uploaded resumes.
+Headers: Authorization: Bearer <access_token>
+Response (200 OK):
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65ae64b1f481234567890abe",
+      "candidateId": "65ae64b1f481234567890abc",
+      "fileName": "resume.pdf",
+      "filePath": "uploads/resume-123.pdf",
+      "fileSize": 102400,
+      "uploadDate": "2026-01-22T10:05:00.000Z",
+      "isPrimary": true,
+      "createdAt": "2026-01-22T10:05:00.000Z",
+      "updatedAt": "2026-01-22T10:05:00.000Z",
+      "analysis": {
+        "_id": "65ae64b1f481234567890abf",
+        "resumeId": "65ae64b1f481234567890abe",
+        "candidateId": "65ae64b1f481234567890abc",
+        "extractedSkills": ["javascript", "typescript", "react"],
+        "extractedTechStack": ["node.js", "mongodb"],
+        "totalExperience": 5.5,
+        "educationSummary": "B.S. Computer Science",
+        "workExperience": [
+          {
+            "company": "Tech Corp",
+            "position": "Senior Dev",
+            "duration": "2 years",
+            "description": "Led team..."
+          }
+        ],
+        "certifications": ["AWS Certified"],
+        "keywords": ["full stack", "mobile"],
+        "candidateSummary": "Strong background in mobile dev...",
+        "parsedAt": "2026-01-22T10:05:05.000Z",
+        "createdAt": "2026-01-22T10:05:05.000Z",
+        "updatedAt": "2026-01-22T10:05:05.000Z"
+      }
+    }
+  ]
+}
+
+--------------------------------------------------------------------------------
+4. JOB DISCOVERY
+--------------------------------------------------------------------------------
+
+[GET] /api/candidate/jobs
+Description: Browse and filter jobs.
+Headers: Authorization: Bearer <access_token>
+Query Parameters:
+  page: number (default: 1)
+  limit: number (default: 10)
+  skills: string (comma-separated)
+  location: string
+  experienceMin: number
+  salaryMin: number
+  employmentType: string
+  search: string
+Response (200 OK):
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65ae64b1f481234567890ac0",
+      "title": "Senior React Developer",
+      "description": "We are looking for...",
+      "companyName": "Innovative Tech",
+      "location": "Remote",
+      "experienceMin": 3,
+      "experienceMax": 5,
+      "salaryMin": 100000,
+      "salaryMax": 150000,
+      "currency": "USD",
+      "employmentType": "FULL_TIME",
+      "requiredSkills": ["react", "redux"],
+      "techStack": ["react", "node"],
+      "status": "ACTIVE",
+      "aiGenerated": false,
+      "views": 10,
+      "createdAt": "2026-01-20T09:00:00.000Z",
+      "updatedAt": "2026-01-20T09:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}
+
+[GET] /api/candidate/jobs/:jobId
+Description: Get full details of a specific job.
+Headers: Authorization: Bearer <access_token>
+Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "_id": "65ae64b1f481234567890ac0",
+    "title": "Senior React Developer",
+    "description": "We are looking for...",
+    "companyName": "Innovative Tech",
+    "location": "Remote",
+    "experienceMin": 3,
+    "experienceMax": 5,
+    "salaryMin": 100000,
+    "salaryMax": 150000,
+    "currency": "USD",
+    "employmentType": "FULL_TIME",
+    "requiredSkills": ["react", "redux"],
+    "techStack": ["react", "node"],
+    "status": "ACTIVE",
+    "aiGenerated": false,
+    "views": 11,
+    "createdAt": "2026-01-20T09:00:00.000Z",
+    "updatedAt": "2026-01-20T09:00:00.000Z"
+  }
+}
+
+--------------------------------------------------------------------------------
+5. APPLICATIONS
+--------------------------------------------------------------------------------
+
+[POST] /api/candidate/applications
+Description: Apply for a job.
+Headers: Content-Type: application/json, Authorization: Bearer <access_token>
+Body:
+{
+  "jobId": "65ae64b1f481234567890ac0",      // Required
+  "coverLetter": "I am excited to apply..." // Optional
+}
+Response (201 Created):
+{
+  "success": true,
+  "message": "Application submitted successfully",
+  "data": {
+    "application": {
+      "_id": "65ae64b1f481234567890ac1",
+      "jobId": "65ae64b1f481234567890ac0",
+      "candidateId": "65ae64b1f481234567890abc",
+      "resumeId": "65ae64b1f481234567890abe",
+      "status": "APPLIED",
+      "coverLetter": "I am excited to apply...",
+      "appliedDate": "2026-01-22T10:10:00.000Z",
+      "statusHistory": [
+        {
+          "status": "APPLIED",
+          "changedAt": "2026-01-22T10:10:00.000Z"
+        }
+      ],
+      "createdAt": "2026-01-22T10:10:00.000Z",
+      "updatedAt": "2026-01-22T10:10:00.000Z"
+    },
+    "matchScore": {
+      "overallScore": 85,
+      "reasoning": "Candidate matches required skills..."
+    }
+  }
+}
+
+[GET] /api/candidate/applications
+Description: View application history.
+Headers: Authorization: Bearer <access_token>
+Query Parameters: page, limit, status
+Response (200 OK):
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65ae64b1f481234567890ac1",
+      "jobId": {
+        "_id": "65ae64b1f481234567890ac0",
+        "recruiterId": "65ae64b1f481234567890999",
+        "title": "Senior React Developer",
+        "description": "We are looking for...",
+        "companyName": "Innovative Tech",
+        "location": "Remote",
+        "experienceMin": 3,
+        "experienceMax": 5,
+        "salaryMin": 100000,
+        "salaryMax": 150000,
+        "currency": "USD",
+        "employmentType": "FULL_TIME",
+        "requiredSkills": ["react", "redux"],
+        "techStack": ["react", "node"],
+        "status": "ACTIVE",
+        "aiGenerated": false,
+        "views": 11,
+        "createdAt": "2026-01-20T09:00:00.000Z",
+        "updatedAt": "2026-01-20T09:00:00.000Z"
+      },
+      "candidateId": "65ae64b1f481234567890abc",
+      "resumeId": "65ae64b1f481234567890abe",
+      "status": "APPLIED",
+      "coverLetter": "I am excited to apply...",
+      "appliedDate": "2026-01-22T10:10:00.000Z",
+      "statusHistory": [
+        {
+          "status": "APPLIED",
+          "changedAt": "2026-01-22T10:10:00.000Z"
+        }
+      ],
+      "createdAt": "2026-01-22T10:10:00.000Z",
+      "updatedAt": "2026-01-22T10:10:00.000Z",
+      "matchScore": {
+        "_id": "65ae64b1f481234567890ac2",
+        "applicationId": "65ae64b1f481234567890ac1",
+        "jobId": "65ae64b1f481234567890ac0",
+        "candidateId": "65ae64b1f481234567890abc",
+        "overallScore": 85,
+        "skillMatchScore": 90,
+        "experienceScore": 80,
+        "techStackScore": 85,
+        "matchedSkills": ["react"],
+        "missingSkills": ["redux"],
+        "breakdown": { "reasoning": "..." },
+        "calculatedAt": "2026-01-22T10:10:05.000Z",
+        "createdAt": "2026-01-22T10:10:05.000Z",
+        "updatedAt": "2026-01-22T10:10:05.000Z"
+      }
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPrevPage": false
+  }
+}
+
+[GET] /api/candidate/applications/:applicationId
+Description: Get details and status of a specific application.
+Headers: Authorization: Bearer <access_token>
+Response (200 OK):
+{
+  "success": true,
+  "data": {
+    "_id": "65ae64b1f481234567890ac1",
+    "jobId": {
+      "_id": "65ae64b1f481234567890ac0",
+      "title": "Senior React Developer",
+      "companyName": "Innovative Tech",
+      "location": "Remote",
+      "employmentType": "FULL_TIME",
+      "status": "ACTIVE"
+    },
+    "candidateId": "65ae64b1f481234567890abc",
+    "status": "APPLIED",
+    "coverLetter": "I am excited to apply...",
+    "appliedDate": "2026-01-22T10:10:00.000Z",
+    "matchScore": {
+      "overallScore": 85,
+      "reasoning": "Candidate matches required skills..."
+    }
+  }
+}
+
+--------------------------------------------------------------------------------
+ERROR HANDLING
+--------------------------------------------------------------------------------
+Standard Error Format:
+{
+  "success": false,
+  "message": "Error description here",
+  "errors": [ { "field": "email", "message": "Invalid email" } ] // Optional validation details
+}
+
+Common Errors:
+- 404 Route not found: Ensure the URL includes the '/api' prefix and the ID (if any) is a valid 24-char MongoID.
+- 400 Validation failed: Check request body fields against requirements.

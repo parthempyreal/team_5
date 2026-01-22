@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1064638472169",
+    "project_id": "smarthire-application",
+    "storage_bucket": "smarthire-application.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1064638472169:android:c4b2447b5626db082ef578",
+        "android_client_info": {
+          "package_name": "com.jobportal.ai.job_portal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANqwSGrySCnQyySUpqqIfBhHCZ6qmiVBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

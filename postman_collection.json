@@ -1,0 +1,394 @@
+{
+  "info": {
+    "name": "AI-Powered ATS - Mobile API",
+    "_postman_id": "ats-mobile-api-collection",
+    "description": "Complete API collection for the AI-Powered ATS Candidate Mobile App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001/api",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Candidate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"candidate@example.com\",\n  \"password\": \"Test123!\",\n  \"role\": \"CANDIDATE\",\n  \"fullName\": \"John Candidate\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"candidate@example.com\",\n  \"password\": \"Test123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resume",
+      "item": [
+        {
+          "name": "Upload Resume (PDF)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "src": "/path/to/resume.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/candidate/resume/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "resume", "upload"]
+            },
+            "description": "Upload a PDF resume file (max 5MB). The resume will be parsed by AI to extract skills, experience, and other information."
+          }
+        },
+        {
+          "name": "Get My Resumes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/resumes",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "resumes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Browse Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/jobs?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skills",
+                  "value": "react,node.js",
+                  "disabled": true
+                },
+                {
+                  "key": "techStack",
+                  "value": "docker,aws",
+                  "disabled": true
+                },
+                {
+                  "key": "location",
+                  "value": "Remote",
+                  "disabled": true
+                },
+                {
+                  "key": "experienceMin",
+                  "value": "3",
+                  "disabled": true
+                },
+                {
+                  "key": "experienceMax",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "salaryMin",
+                  "value": "100000",
+                  "disabled": true
+                },
+                {
+                  "key": "employmentType",
+                  "value": "FULL_TIME",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "senior engineer",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Browse available job postings with optional filters. Enable query parameters as needed."
+          }
+        },
+        {
+          "name": "Browse Jobs - With Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/jobs?page=1&limit=10&skills=react,node.js&location=Remote&experienceMin=2&employmentType=FULL_TIME",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skills",
+                  "value": "react,node.js"
+                },
+                {
+                  "key": "location",
+                  "value": "Remote"
+                },
+                {
+                  "key": "experienceMin",
+                  "value": "2"
+                },
+                {
+                  "key": "employmentType",
+                  "value": "FULL_TIME"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Job Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/jobs/:jobId",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "jobs", ":jobId"],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": "JOB_ID_HERE",
+                  "description": "MongoDB ObjectId of the job"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Apply to Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"JOB_ID_HERE\",\n  \"coverLetter\": \"I am excited to apply for this position. With my experience in software development and passion for building great products, I believe I would be a valuable addition to your team.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/candidate/applications",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "applications"]
+            },
+            "description": "Submit an application to a job. Requires a primary resume to be uploaded first."
+          }
+        },
+        {
+          "name": "Get My Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/applications?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "applications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "APPLIED",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all applications submitted by the candidate. Optional filter by status: APPLIED, SHORTLISTED, REJECTED, HIRED"
+          }
+        },
+        {
+          "name": "Get My Applications - Shortlisted",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/applications?status=SHORTLISTED",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "applications"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SHORTLISTED"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Application Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/candidate/applications/:applicationId",
+              "host": ["{{baseUrl}}"],
+              "path": ["candidate", "applications", ":applicationId"],
+              "variable": [
+                {
+                  "key": "applicationId",
+                  "value": "APPLICATION_ID_HERE",
+                  "description": "MongoDB ObjectId of the application"
+                }
+              ]
+            },
+            "description": "Get detailed status of a specific application including match score breakdown."
+          }
+        }
+      ]
+    }
+  ]
+}
