@@ -351,6 +351,22 @@ export class RecruiterController {
 
       await application.save();
 
+      // Send notification to candidate
+      try {
+        await NotificationService.sendToUser(
+          application.candidateId.toString(),
+          'Application Shortlisted',
+          `Your application for ${job.title} at ${job.companyName} has been shortlisted!`,
+          {
+            type: 'APPLICATION_STATUS',
+            applicationId: application._id.toString(),
+            status: ApplicationStatus.SHORTLISTED
+          }
+        );
+      } catch (notifyError) {
+        console.error('Failed to send application status notification:', notifyError);
+      }
+
       res.json({
         success: true,
         message: 'Application shortlisted successfully',
@@ -397,6 +413,22 @@ export class RecruiterController {
       });
 
       await application.save();
+
+      // Send notification to candidate
+      try {
+        await NotificationService.sendToUser(
+          application.candidateId.toString(),
+          'Update on your Application',
+          `Your application for ${job.title} at ${job.companyName} was not successful this time.`,
+          {
+            type: 'APPLICATION_STATUS',
+            applicationId: application._id.toString(),
+            status: ApplicationStatus.REJECTED
+          }
+        );
+      } catch (notifyError) {
+        console.error('Failed to send application status notification:', notifyError);
+      }
 
       res.json({
         success: true,

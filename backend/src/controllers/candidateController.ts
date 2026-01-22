@@ -139,9 +139,27 @@ export class CandidateController {
       const jobIds = jobs.map((j) => j._id);
       await JobPost.updateMany({ _id: { $in: jobIds } }, { $inc: { views: 1 } });
 
+      // Check application status
+      let jobsWithStatus = jobs;
+      if (req.user?.userId) {
+        const applications = await Application.find({
+          candidateId: req.user.userId,
+          jobId: { $in: jobIds },
+        }).select('jobId');
+
+        const appliedJobIds = new Set(
+          applications.map((app) => app.jobId.toString())
+        );
+
+        jobsWithStatus = jobs.map((job) => ({
+          ...job,
+          hasApplied: appliedJobIds.has(job._id.toString()),
+        }));
+      }
+
       res.json({
         success: true,
-        data: jobs,
+        data: jobsWithStatus,
         meta: getPaginationMeta(total, pagination.page, pagination.limit),
       });
     } catch (error) {
